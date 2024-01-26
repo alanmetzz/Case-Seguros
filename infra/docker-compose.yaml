@@ -1,0 +1,181 @@
+version: '3.8'
+
+services:
+  case-app:
+    image: app-case:v0.4
+    ports:
+      - "5000:5000"
+      - "8000:8000"
+    environment:
+      - TIMEOUT=5.0
+      - THECATAPI_API_KEY=live_KMvUX4BB22nGq6lV87LGGVtYqvaTVohrRrIoMvuAMphHYEyokdO9zErEQ5b9UjGn
+      - LOG_LEVEL=INFO
+      - INITIAL_FLOW_CATS=FALSE
+    depends_on:
+      - prometheus
+      - promtail
+    networks:
+      - case
+    volumes:
+    - app-data:/app/app/database/files
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+      service_name: "case-app"
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION:-10.3.1}
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_USERS_DEFAULT_THEME=dark
+      - GF_LOG_MODE=console
+      - GF_LOG_LEVEL=critical
+      - GF_PANELS_ENABLE_ALPHA=false
+      - GF_INSTALL_PLUGINS=grafana-polystat-panel
+    volumes:
+      - ./configs/grafana/datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yaml:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - promtail
+    ports:
+      - 3000:3000
+    networks:
+      - case
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+      service_name: "grafana"
+
+  promtail:
+    image: grafana/promtail:2.9.4
+    volumes:
+      # custom config will read logs from the containers of
+      # this project
+      - ./configs/loki/promtail-config.yaml:/etc/promtail/config.yml
+      # to read container labels and logs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      - case
+    depends_on:
+     - loki
+    labels:
+      service_name: "promtail"
+
+  loki:
+    image: grafana/loki:2.9.4
+    ports:
+      - "3100:3100"
+    command: >-
+      -config.file=/etc/loki/local-config.yaml
+      -boltdb.shipper.compactor.ring.instance-addr=127.0.0.1
+      -distributor.ring.instance-addr=127.0.0.1
+      -frontend.instance-addr=127.0.0.1
+      -index-gateway.ring.instance-addr=127.0.0.1
+      -ingester.lifecycler.addr=127.0.0.1
+      -query-scheduler.ring.instance-addr=127.0.0.1
+      -ruler.ring.instance-addr=127.0.0.1
+    volumes:
+    - loki-data:/loki
+    networks:
+      - case
+    labels:
+      service_name: "loki"
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.49.1}
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--log.level=error'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.external-url=http://localhost:9090'
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./configs/prometheus/recording-rules.yml:/etc/prometheus/recording-rules.yml
+      - ./configs/prometheus/alerting-rules.yml:/etc/prometheus/alerting-rules.yml
+      - prometheus-data:/prometheus
+    depends_on:
+      - alertmanager
+    ports:
+      - 9090:9090
+    networks:
+      - case
+    labels:
+      service_name: "prometheus"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.47.2}
+    container_name: cadvisor
+    restart: always
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+        # https://github.com/google/cadvisor/issues/1565#issuecomment-718812180
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- /dev/disk:/dev/disk:ro
+    networks:
+      - case
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+      service_name: "cadvisor"
+
+  node-exporter:
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-v1.7.0}
+    container_name: node-exporter
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points'
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    networks:
+      - case
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+      service_name: "node-exporter"
+
+
+  alertmanager:
+    image: prom/alertmanager:${ALERTMANAGER_VERSION:-v0.25.0}
+    container_name: alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--log.level=error'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+    volumes:
+      - ./configs/alertmanager/fallback.yml:/etc/alertmanager/config.yml
+    ports:
+      - 9093:9093
+    networks:
+      - case
+    labels:
+      service_name: "node-exporter"
+
+volumes:
+  grafana-data: {}
+  prometheus-data: {}
+  loki-data: {}
+  app-data: {}
+
+networks:
+  case:
+    name: case
