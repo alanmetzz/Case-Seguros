@@ -17,4 +17,4 @@ def consumir_api_thecatapi(url):
         return response
     except requests.exceptions.RequestException as e:
         logger.error(f'Erro ao consumir a API TheCatAPI: {str(e)}')
-        return None
+        return response

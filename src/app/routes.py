@@ -26,8 +26,9 @@ def configurar_timeout(resposta):
 racas_routes = Blueprint('racas_routes', __name__)
 racas_routes.after_request(configurar_timeout)
 
-@racas_routes.route('/raca/details/<raca_id>', methods=['GET'])
-def info_raca(raca_id):
+@racas_routes.route('/raca/details', methods=['GET'])
+def info_raca():
+    raca_id = request.args.get('raca_id')
     try:
         info_raca = buscar_info_raca_from_database(raca_id)
         if info_raca:
@@ -35,7 +36,7 @@ def info_raca(raca_id):
             imagens = buscar_imagens_por_raca_from_database(info_raca['id'])
             info_raca['images'] = imagens
 
-            return jsonify([{'id': info_raca['id'], 'raca': info_raca['raca'], 'origem': info_raca['origem'], 'temperamento': info_raca['temperamento'], 'descricao': info_raca['descricao'], 'imagens': info_raca['images']}])
+            return jsonify([{'id': info_raca['id'], 'breed_id': info_raca['breed_id'], 'raca': info_raca['raca'], 'origem': info_raca['origem'], 'temperamento': info_raca['temperamento'], 'descricao': info_raca['descricao'], 'imagens': info_raca['images']}])
         else:
             return jsonify({'message': 'Raça não encontrada'}), 404
     except Exception as e:
