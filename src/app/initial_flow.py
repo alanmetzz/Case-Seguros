@@ -31,7 +31,7 @@ def iniciar_coleta_em_segundo_plano():
 def total_racas():
     racas_api = consumir_api_thecatapi('https://api.thecatapi.com/v1/breeds')
 
-    if racas_api:
+    if racas_api.status_code == 200:
         racas = racas_api.json()
         number_of_breeds = len(racas)
         logger.info(f"O numero de racas de gatos na API: {number_of_breeds}")
@@ -56,7 +56,7 @@ def coletar_info_gatos():
                     nome_raca = info_gato_api.json().get('name', '')
 
                     # Verificar se a raça já existe no banco de dados
-                    if verificar_existencia_raca(nome_raca):
+                    if verificar_existencia_raca(raca_id):
                         logger.warning(f'A raça {nome_raca} já existe no banco. As informações não foram inseridas novamente.')
                         continue  # Pular para a próxima iteração
                     if not info_gato_api or not info_gato_api.ok:
@@ -68,6 +68,7 @@ def coletar_info_gatos():
                         logger.warning(f'Resposta da API TheCatAPI não contém JSON válido para a raça {raca_id}.')
                         continue
                     info_gato = {
+                        'breed_id': raca_id,
                         'name': info_gato_api_json.get('name', ''),
                         'origin': info_gato_api_json.get('origin', ''),
                         'temperament': info_gato_api_json.get('temperament', ''),
@@ -96,7 +97,7 @@ def coletar_info_gatos():
 
                     # Inserir informações no banco de dados
                     inserir_info_basica_no_banco(info_gato)
-                    inserir_imagens_no_banco(info_gato)
+                    inserir_imagens_no_banco(info_gato, "normal")
 
                     logger.info(f'Informações da raça {info_gato["name"]} coletadas e salvas no banco.')
                 else:
@@ -111,33 +112,33 @@ def coletar_e_salvar_imagens():
     imagens_com_chapeu = consumir_api_thecatapi(f'https://api.thecatapi.com/v1/images/search?category_ids=1&limit=3')
     imagens_com_oculos = consumir_api_thecatapi(f'https://api.thecatapi.com/v1/images/search?category_ids=4&limit=3')
 
-    urls_chapeu = [img['url'] for img in imagens_com_chapeu.json()] if imagens_com_chapeu and imagens_com_chapeu.ok else []
-    urls_oculos = [img['url'] for img in imagens_com_oculos.json()] if imagens_com_oculos and imagens_com_oculos.ok else []
+    ids_chapeu = [img['id'] for img in imagens_com_chapeu.json()] if imagens_com_chapeu and imagens_com_chapeu.ok else []
+    ids_oculos = [img['id'] for img in imagens_com_oculos.json()] if imagens_com_oculos and imagens_com_oculos.ok else []
 
-    for url in urls_chapeu:
-        info_imagem = obter_info_imagem(url)
+    for ids in ids_chapeu:
+        info_imagem = obter_info_imagem(ids)
         if info_imagem:
             info_gato = {
                 'name': info_imagem.get('breeds')[0]['name'] if 'breeds' in info_imagem else 'Desconhecida',
-                'image': {'url': [url]}
+                'image': info_imagem.get('url'),
             }
             inserir_info_basica_no_banco(info_gato)
-            inserir_imagens_no_banco(info_gato)
+            inserir_imagens_no_banco(info_gato,"hats_sun")
 
-    for url in urls_oculos:
-        info_imagem = obter_info_imagem(url)
+    for ids in ids_oculos:
+        info_imagem = obter_info_imagem(ids)
         if info_imagem:
             info_gato = {
                 'name': info_imagem.get('breeds')[0]['name'] if 'breeds' in info_imagem else 'Desconhecida',
-                'image': {'url': [url]}
+                'image': info_imagem.get('url'),
             }
             inserir_info_basica_no_banco(info_gato)
-            inserir_imagens_no_banco(info_gato)
+            inserir_imagens_no_banco(info_gato,"hats_sun")
 
 # Função para obter informações detalhadas de uma imagem
-def obter_info_imagem(url):
+def obter_info_imagem(id):
     try:
-        response = consumir_api_thecatapi(f'https://api.thecatapi.com/v1/images?&url={url}')
+        response = consumir_api_thecatapi(f'https://api.thecatapi.com/v1/images/{id}')
         return response.json()[0] if response and response.ok else None
     except Exception as e:
         logger.warning(f'Erro ao obter informações da imagem: {str(e)}')
