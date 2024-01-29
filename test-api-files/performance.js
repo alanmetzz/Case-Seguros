@@ -22,5 +22,5 @@ export const options = {
 
 export default function () {
 
-  const response = http.get('http://localhost:5000/racas/details?raca_id=abys');
+  const response = http.get('http://localhost:5000/raca/details?raca_id=abys');
 }
