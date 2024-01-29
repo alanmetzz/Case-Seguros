@@ -1,7 +1,7 @@
 FROM python:3.9.18-alpine3.19
 WORKDIR /app
 COPY requirements.txt .
-RUN apk upgrade
+RUN apk upgrade && apk add curl
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
 RUN pip install --no-cache-dir -r requirements.txt

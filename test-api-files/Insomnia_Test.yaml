@@ -1,0 +1,177 @@
+_type: export
+__export_format: 4
+__export_date: 2024-01-28T17:46:26.625Z
+__export_source: insomnia.desktop.app:v8.6.0
+resources:
+  - _id: req_5b00829e79c84ac8ace2973e795a3298
+    parentId: wrk_1e760b3ef41b46639369251115be40c7
+    modified: 1706387756703
+    created: 1706374085140
+    url: http://localhost:5000/raca/details
+    name: Listar info raca
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - id: pair_aae0425d957745ab9f415c4eac30538a
+        name: raca_id
+        value: abys
+        description: ""
+        disabled: false
+    headers:
+      - name: User-Agent
+        value: insomnia/8.6.0
+    authentication: {}
+    metaSortKey: -1706374085140
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: wrk_1e760b3ef41b46639369251115be40c7
+    parentId: null
+    modified: 1706379745354
+    created: 1706379745354
+    name: Case Seguros
+    description: ""
+    scope: collection
+    _type: workspace
+  - _id: req_fed23797019f4791a73110ebaab42baf
+    parentId: wrk_1e760b3ef41b46639369251115be40c7
+    modified: 1706378146085
+    created: 1706373863977
+    url: http://localhost:5000/racas
+    name: Listar todas as raças
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers:
+      - name: User-Agent
+        value: insomnia/8.6.0
+        id: pair_9b77487e790243c3aaf93097b966153c
+    authentication: {}
+    metaSortKey: -1706373863977
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_f151e83031434e9eb5ee0f1594e7ce55
+    parentId: wrk_1e760b3ef41b46639369251115be40c7
+    modified: 1706383638517
+    created: 1706379456432
+    url: http://localhost:5000/racas_by
+    name: Listar raças por temperamento
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - id: pair_1a9ec6cfbd994746ba2f2f963a552744
+        name: temperamento
+        value: active
+        description: ""
+    headers:
+      - name: User-Agent
+        value: insomnia/8.6.0
+        id: pair_9b77487e790243c3aaf93097b966153c
+    authentication: {}
+    metaSortKey: -1706373863927
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_49d99308793a4426996821f88943aec8
+    parentId: wrk_1e760b3ef41b46639369251115be40c7
+    modified: 1706383642468
+    created: 1706379512674
+    url: http://localhost:5000/racas_by
+    name: Listar raças por temperamento e origem
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - id: pair_1a9ec6cfbd994746ba2f2f963a552744
+        name: temperamento
+        value: intelligent
+        description: ""
+        disabled: false
+      - id: pair_158ef133ebf84870ba145b30ba1d4e6e
+        name: origem
+        value: united states
+        description: ""
+    headers:
+      - name: User-Agent
+        value: insomnia/8.6.0
+        id: pair_9b77487e790243c3aaf93097b966153c
+    authentication: {}
+    metaSortKey: -1706373863902
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_f7325cbbdd2f4b85bc97ca0c4f943981
+    parentId: wrk_1e760b3ef41b46639369251115be40c7
+    modified: 1706383645765
+    created: 1706379475128
+    url: http://localhost:5000/racas_by
+    name: Listar raças por origem
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - id: pair_1a9ec6cfbd994746ba2f2f963a552744
+        name: origem
+        value: united states
+        description: ""
+    headers:
+      - name: User-Agent
+        value: insomnia/8.6.0
+        id: pair_9b77487e790243c3aaf93097b966153c
+    authentication: {}
+    metaSortKey: -1706373863877
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_d65e205306814c88a717a490fbdc1969
+    parentId: wrk_1e760b3ef41b46639369251115be40c7
+    modified: 1706373844648
+    created: 1706373844648
+    name: Base Environment
+    data: {}
+    dataPropertyOrder: null
+    color: null
+    isPrivate: false
+    metaSortKey: 1706373844648
+    _type: environment
+  - _id: jar_5931d2d3bea042da83537eb9ca16331b
+    parentId: wrk_1e760b3ef41b46639369251115be40c7
+    modified: 1706373844652
+    created: 1706373844652
+    name: Default Jar
+    cookies: []
+    _type: cookie_jar

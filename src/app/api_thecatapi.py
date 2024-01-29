@@ -8,7 +8,7 @@ def consumir_api_thecatapi(url):
     api_key = os.environ.get('THECATAPI_API_KEY', None)
 
     if not api_key:
-        logger.warning('A API Key da TheCatAPI não está configurada. As solicitações podem ser limitadas.')
+        logger.warning('A API Key da TheCatAPI nao esta configurada. As solicitacoes podem ser limitadas.')
 
     try:
         headers = {'x-api-key': api_key} if api_key else {}
