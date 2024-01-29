@@ -52,8 +52,10 @@ Para executar:
 
 ````shell
 K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
-k6 run -o experimental-prometheus-rw --tag testid=UserTest2 test-api-files/performance.js
+k6 run -o experimental-prometheus-rw --tag testid=<UNIC_ID> test-api-files/performance.js
 ````
+
+Obs.: Alterar a tag `testid` para ID único, para assim diferenciar as execuções.
 
 Obs.: Neste cenário, estou usando a feature de [Rw do Prometheus](https://k6.io/docs/results-output/real-time/prometheus-remote-write/) para enviar as métricas diretamente para o Prometheus e podermos validar, caso não tiver configurado o Prometheus localmente, executar somente o `k6 run` desta forma:
 
