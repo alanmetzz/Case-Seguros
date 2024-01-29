@@ -21,9 +21,6 @@ export const options = {
 };
 
 export default function () {
-  const url = new URL('http://localhost:5000/raca/details');
 
-  url.searchParams.append('raca_id', 'abys');
-
-  const response = http.get(url.toString());
+  const response = http.get('http://localhost:5000/racas/details?raca_id=abys');
 }
