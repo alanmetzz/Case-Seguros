@@ -9,15 +9,6 @@ clients:
 scrape_configs:
   - job_name: docker
     # use docker.sock to filter containers
-    dockerswarm_sd_configs:
-      - host: "unix:///var/run/docker.sock"
-        refresh_interval: 15s
-        role: tasks
-        filters:
-          - name: label
-            values: ["logging=promtail"]
-  - job_name: docker
-    # use docker.sock to filter containers
     docker_sd_configs:
       - host: "unix:///var/run/docker.sock"
         refresh_interval: 15s
