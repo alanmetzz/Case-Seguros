@@ -1,0 +1,83 @@
+swagger: '2.0'
+info:
+  title: API Case Seguros
+  description: Uma API para obter informações sobre raças de gatos
+  version: 0.1
+paths:
+  /racas:
+    get:
+      summary: Listar todas as raças
+      description: Retorna o id, breed_id e nome de todas as raças salvas
+      responses:
+        200:
+          description: OK
+          examples:
+            application/json:
+              'racas': []
+        500:
+          description: Erro Interno
+          examples:
+            application/json:
+              'message': 'Erro ao buscar/listar raças'
+  /racas_by:
+    get:
+      summary: Listar todas as raças filtrando por temperamento ou origem, ou ambos
+      description: Retorna o id, breed_id e nome de todas as raças salvas de acordo com o filtro, pelo menos 1 filtro é necessário
+      parameters:
+        - name: temperamento
+          in: query
+          type: string
+          description: Tipo de temperamento (Em Ingles)(OPCIONAL)
+        - name: origem
+          in: query
+          type: string
+          description: País de origem (Em Ingles)(OPCIONAL)
+      responses:
+        200:
+          description: OK
+          examples:
+            application/json:
+              'racas': []
+        500:
+          description: Erro Interno
+          examples:
+            application/json:
+              'message': 'Erro ao buscar/listar raças por temperamento ou origem'
+  /racas/details:
+    get:
+      summary: Obter informações detalhadas sobre um gato
+      description: Retorna informações (nome, descrição, imagens, raca e temperamento) sobre gatos com base em no id fornecido (ID key ou ID da raça abreviada).
+      parameters:
+        - name: raca_id
+          in: query
+          type: string
+          description: ID da raça (OBRIGATORIO).
+      responses:
+        200:
+          description: OK
+          examples:
+            application/json:
+              {
+                "breed_id": "abys",
+                "descricao": "the abyssinian is easy to care for, and a joy to have in your home. they’re affectionate cats and love both people and other animals.",
+                "id": 1,
+                "imagens": [
+                  {
+                    "url": "https://cdn2.thecatapi.com/images/xnzzM6MBI.jpg"
+                  },
+                  {
+                    "url": "https://cdn2.thecatapi.com/images/EHG3sOpAM.jpg"
+                  },
+                  {
+                    "url": "https://cdn2.thecatapi.com/images/unPP08xOZ.jpg"
+                  }
+                ],
+                "origem": "egypt",
+                "raca": "abyssinian",
+                "temperamento": "active, energetic, independent, intelligent, gentle"
+              }
+        404:
+          description: NOT FOUND
+          examples:
+            application/json:
+              'message': 'Raça não encontrada'

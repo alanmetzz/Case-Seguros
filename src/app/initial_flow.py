@@ -17,8 +17,8 @@ def iniciar_coleta_em_segundo_plano():
     initial_flow_cats = os.environ.get('INITIAL_FLOW_CATS', 'FALSE').upper()
     initial_flow_hats_cats = os.environ.get('INITIAL_FLOW_HATS_CATS', 'FALSE').upper()
 
-    logger.info(f"A variavel de carga inicial esta definida como: {initial_flow_cats}")
-    logger.info(f"A variavel de carga inicial esta definida como: {initial_flow_hats_cats}")
+    logger.info(f"A variavel de carga inicial INITIAL_FLOW_CATS esta definida como: {initial_flow_cats}")
+    logger.info(f"A variavel de carga inicial de imagens INITIAL_FLOW_HATS_CATS esta definida como: {initial_flow_hats_cats}")
 
     if initial_flow_cats == "TRUE":
         thread_info_gatos  = threading.Thread(target=coletar_info_gatos)
@@ -57,15 +57,15 @@ def coletar_info_gatos():
 
                     # Verificar se a raça já existe no banco de dados
                     if verificar_existencia_raca(raca_id):
-                        logger.warning(f'A raça {nome_raca} já existe no banco. As informações não foram inseridas novamente.')
+                        logger.warning(f'A raca {nome_raca} ja existe no banco. As informacoes nao foram inseridas novamente.')
                         continue  # Pular para a próxima iteração
                     if not info_gato_api or not info_gato_api.ok:
-                        logger.warning(f'Não foi possível obter informações da raça com ID {raca_id} da API TheCatAPI.')
+                        logger.warning(f'Nao foi possivel obter informacoes da raca com ID {raca_id} da API TheCatAPI.')
                         continue
                     try:
                         info_gato_api_json = info_gato_api.json()
                     except ValueError:
-                        logger.warning(f'Resposta da API TheCatAPI não contém JSON válido para a raça {raca_id}.')
+                        logger.warning(f'Resposta da API TheCatAPI nao contem JSON valido para a raca {raca_id}.')
                         continue
                     info_gato = {
                         'breed_id': raca_id,
@@ -83,10 +83,10 @@ def coletar_info_gatos():
                         try:
                             imagens_aleatorias_json = imagens_aleatorias.json()
                         except ValueError as e:
-                            logger.warning(f'Resposta da API TheCatAPI (imagens aleatórias) não contém JSON válido para a raça {raca_id}. Erro: {str(e)}')
+                            logger.warning(f'Resposta da API TheCatAPI (imagens aleatorias) nao contem JSON valido para a raca {raca_id}. Erro: {str(e)}')
                             imagens_aleatorias_json = []
                     else:
-                        logger.warning(f'Não foi possível obter imagens aleatórias para a raça com ID {raca_id}. Status code: {imagens_aleatorias.status_code}')
+                        logger.warning(f'Nao foi possivel obter imagens aleatorias para a raca com ID {raca_id}. Status code: {imagens_aleatorias.status_code}')
                         imagens_aleatorias_json = []
 
                     # Combinar URLs de imagens aleatórias
@@ -99,14 +99,14 @@ def coletar_info_gatos():
                     inserir_info_basica_no_banco(info_gato)
                     inserir_imagens_no_banco(info_gato, "normal")
 
-                    logger.info(f'Informações da raça {info_gato["name"]} coletadas e salvas no banco.')
+                    logger.info(f'Informacoes da raca {info_gato["name"]} coletadas e salvas no banco.')
                 else:
-                    logger.warning(f'Não foi possível obter informações da raça com ID {raca_id} da API TheCatAPI.')
+                    logger.warning(f'Nao foi possivel obter informacoes da raca com ID {raca_id} da API TheCatAPI.')
         else:
-            logger.warning('Não foi possível obter a lista de raças da API TheCatAPI.')
+            logger.warning('Nao foi possivel obter a lista de racas da API TheCatAPI.')
         logger.info(f'Finalizado a carga base.')
     except Exception as e:
-        logger.error(f'Erro ao coletar informações dos gatos: {str(e)}')
+        logger.error(f'Erro ao coletar informacoes dos gatos: {str(e)}')
 
 def coletar_e_salvar_imagens():
     imagens_com_chapeu = consumir_api_thecatapi(f'https://api.thecatapi.com/v1/images/search?category_ids=1&limit=3')
@@ -141,5 +141,5 @@ def obter_info_imagem(id):
         response = consumir_api_thecatapi(f'https://api.thecatapi.com/v1/images/{id}')
         return response.json()[0] if response and response.ok else None
     except Exception as e:
-        logger.warning(f'Erro ao obter informações da imagem: {str(e)}')
+        logger.warning(f'Erro ao obter informacoes da imagem: {str(e)}')
         return None

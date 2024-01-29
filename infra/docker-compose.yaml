@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   case-app:
-    image: app-case:v0.4
+    build:
+      context: ./
+      dockerfile: ../src/Dockerfile
+    image: app-case:v0.1
     ports:
       - "5000:5000"
       - "8000:8000"
@@ -11,6 +14,7 @@ services:
       - THECATAPI_API_KEY=live_KMvUX4BB22nGq6lV87LGGVtYqvaTVohrRrIoMvuAMphHYEyokdO9zErEQ5b9UjGn
       - LOG_LEVEL=INFO
       - INITIAL_FLOW_CATS=FALSE
+      - INITIAL_FLOW_HATS_CATS=FALSE
     depends_on:
       - prometheus
       - promtail
@@ -37,6 +41,8 @@ services:
       - GF_INSTALL_PLUGINS=grafana-polystat-panel
     volumes:
       - ./configs/grafana/datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yaml:ro
+      - ./configs/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/main.yaml
+      - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
@@ -98,6 +104,7 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.external-url=http://localhost:9090'
+      - '--enable-feature=remote-write-receiver'
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./configs/prometheus/recording-rules.yml:/etc/prometheus/recording-rules.yml

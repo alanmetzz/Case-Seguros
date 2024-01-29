@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, Response
 from app.database.database import (
     buscar_racas_por_origem_from_database,
     listar_racas_from_database,
@@ -38,14 +38,22 @@ def info_raca():
 
             return jsonify([{'id': info_raca['id'], 'breed_id': info_raca['breed_id'], 'raca': info_raca['raca'], 'origem': info_raca['origem'], 'temperamento': info_raca['temperamento'], 'descricao': info_raca['descricao'], 'imagens': info_raca['images']}])
         else:
-            return jsonify({'message': 'Raça não encontrada'}), 404
+            return jsonify({'message': 'Raca nao encontrada'}), 404
     except Exception as e:
-        logger.error(f'Erro ao obter informações da raça: {str(e)}')
-        return jsonify({'message': 'Erro ao obter informações da raça'}), 500
-
+        logger.error(f'Erro ao obter informacoes da raca: {str(e)}')
+        return jsonify({'message': 'Erro ao obter informacoes da raca'}), 500
 
 @racas_routes.route('/racas', methods=['GET'])
-def listar_ou_filtrar_racas():
+def listar_racas():
+    try:
+        racas = listar_racas_from_database()
+        return jsonify({'racas': racas})
+    except Exception as e:
+        logger.error(f'Erro ao buscar/listar raca: {str(e)}')
+        return jsonify({'message': 'Erro ao buscar/listar raca'}), 500
+
+@racas_routes.route('/racas_by', methods=['GET'])
+def filtrar_racas():
     try:
         temperamento = request.args.get('temperamento')
         origem = request.args.get('origem')
@@ -56,12 +64,10 @@ def listar_ou_filtrar_racas():
             racas = buscar_racas_por_temperamento_from_database(temperamento)
         elif origem:
             racas = buscar_racas_por_origem_from_database(origem)
-        else:
-            racas = listar_racas_from_database()
 
         return jsonify({'racas': racas})
     except Exception as e:
-        logger.error(f'Erro ao buscar/listar raças: {str(e)}')
-        return jsonify({'message': 'Erro ao buscar/listar raças'}), 500
+        logger.error(f'Erro ao buscar/listar racas: {str(e)}')
+        return jsonify({'message': 'Erro ao buscar/listar racas por temperamento ou origem'}), 500
 
 racas_routes
