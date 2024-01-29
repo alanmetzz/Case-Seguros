@@ -41,7 +41,7 @@ def criar_tabela_gatos():
             ''')
             logger.info('Tabela gatos criada no banco de dados.')
         else:
-            logger.info('Tabela gatos já existe no banco de dados.')
+            logger.info('Tabela gatos ja existe no banco de dados.')
 
         conn.commit()
     except Exception as e:
@@ -67,7 +67,7 @@ def criar_tabela_imagens():
             ''')
             logger.info('Tabela imagens criada no banco de dados.')
         else:
-            logger.info('Tabela imagens já existe no banco de dados.')
+            logger.info('Tabela imagens ja existe no banco de dados.')
 
         conn.commit()
     except Exception as e:
@@ -126,12 +126,12 @@ def inserir_info_basica_no_banco(info_gato):
             ''', (info_gato_lower['breed_id'], info_gato_lower['name'], info_gato_lower.get('origin', ''), info_gato_lower.get('temperament', ''), info_gato_lower.get('description', '')))
 
             conn.commit()
-            logger.info(f'Informações básicas do gato {info_gato_lower["name"]} inseridas no banco.')
+            logger.info(f'Informacoes basicas do gato {info_gato_lower["name"]} inseridas no banco.')
         else:
-            logger.warning(f'A raça {info_gato_lower["name"]} já existe no banco. As informações não foram inseridas novamente.')
+            logger.warning(f'A raca {info_gato_lower["name"]} ja existe no banco. As informacoes nao foram inseridas novamente.')
 
     except Exception as e:
-        logger.error(f'Erro ao inserir informações básicas no banco: {str(e)}')
+        logger.error(f'Erro ao inserir informacoes basicas no banco: {str(e)}')
     finally:
         if conn:
             conn.close()
@@ -154,9 +154,9 @@ def inserir_imagens_no_banco(info_gato,tipo):
             for url in info_gato['image']['url']:
                 cursor.execute('INSERT INTO imagens (raca_id, url) VALUES (?, ?)', (raca_id, url))
 
-            logger.info(f'Imagens da raça {info_gato["name"]} salvas no banco de dados.')
+            logger.info(f'Imagens da raca {info_gato["name"]} salvas no banco de dados.')
         else:
-            logger.warning(f'Ração {info_gato["name"]} não encontrada no banco de dados.')
+            logger.warning(f'Raca {info_gato["name"]} nao encontrada no banco de dados.')
 
         conn.commit()
     except Exception as e:
@@ -166,7 +166,6 @@ def inserir_imagens_no_banco(info_gato,tipo):
         if conn:
             conn.close()
 
-# Alteração na função listar_racas_from_database
 def listar_racas_from_database():
     try:
         # Obter conexão ao banco de dados SQLite
@@ -176,10 +175,10 @@ def listar_racas_from_database():
         cursor.execute('SELECT id, breed_id, raca FROM gatos GROUP BY raca')
         racas = [{'id': r[0], 'breed_id': r[1],'raca': r[2]} for r in cursor.fetchall()]
 
-        logger.info('Lista de raças recuperada do banco de dados.')
+        logger.info('Lista de racas recuperada do banco de dados.')
         return racas
     except Exception as e:
-        logger.error(f'Erro ao listar raças do banco de dados: {str(e)}')
+        logger.error(f'Erro ao listar racas do banco de dados: {str(e)}')
         raise
     finally:
         if conn:
@@ -198,11 +197,13 @@ def obter_raca_id(raca_id):
             raca_id_normalizado = cursor.fetchone()
 
         if raca_id_normalizado:
+            logger.info(f'ID raca normalizado: {raca_id_normalizado[0]}.')
             return raca_id_normalizado[0]
         else:
+            logger.info(f'ID raca normalizado: {raca_id}.')
             return raca_id
     except Exception as e:
-        logger.error(f'Erro ao buscar informações da raça do banco de dados: {str(e)}')
+        logger.error(f'Erro ao buscar informacoes da raca do banco de dados: {str(e)}')
         raise
     finally:
         if conn:
@@ -217,13 +218,14 @@ def buscar_info_raca_from_database(raca_id):
 
         cursor.execute('SELECT id, breed_id, raca, origem, temperamento, descricao FROM gatos WHERE id = ? LIMIT 1', (raca_id_normalizado,))
         info_raca = cursor.fetchone()
+        logger.info('Informacoes de raca recuperadas na database.')
 
         if info_raca:
             return {'id': info_raca[0], 'breed_id': info_raca[1], 'raca': info_raca[2], 'origem': info_raca[3], 'temperamento': info_raca[4], 'descricao': info_raca[5]}
         else:
             return None
     except Exception as e:
-        logger.error(f'Erro ao buscar informações da raça do banco de dados: {str(e)}')
+        logger.error(f'Erro ao buscar informacoes da raca do banco de dados: {str(e)}')
         raise
     finally:
         if conn:
@@ -240,10 +242,10 @@ def buscar_imagens_por_raca_from_database(raca_id):
         cursor.execute('SELECT url FROM imagens WHERE raca_id = ?', (raca_id,))
         imagens = [{'url': imagem[0]} for imagem in cursor.fetchall()]
 
-        logger.info(f'Imagens para a raça {raca_id} recuperadas do banco de dados.')
+        logger.info(f'Imagens para a raca {raca_id} recuperadas do banco de dados.')
         return imagens
     except Exception as e:
-        logger.error(f'Erro ao buscar imagens por raça do banco de dados: {str(e)}')
+        logger.error(f'Erro ao buscar imagens por raca do banco de dados: {str(e)}')
         raise
     finally:
         if conn:
@@ -258,10 +260,10 @@ def buscar_racas_por_temperamento_from_database(temperamento):
         cursor.execute('SELECT id, breed_id, raca FROM gatos WHERE temperamento LIKE ? GROUP BY raca', (f'%{temperamento}%',))
         racas = [{'id': r[0], 'breed_id': r[1], 'raca': r[2]} for r in cursor.fetchall()]
 
-        logger.info(f'Raças com temperamento {temperamento} recuperadas do banco de dados.')
+        logger.info(f'Racas com temperamento {temperamento} recuperadas do banco de dados.')
         return racas
     except Exception as e:
-        logger.error(f'Erro ao buscar raças por temperamento do banco de dados: {str(e)}')
+        logger.error(f'Erro ao buscar racas por temperamento do banco de dados: {str(e)}')
         raise
     finally:
         if conn:
@@ -276,10 +278,10 @@ def buscar_racas_por_origem_from_database(origem):
         cursor.execute('SELECT id, breed_id, raca FROM gatos WHERE origem = ? GROUP BY raca', (origem,))
         racas = [{'id': r[0], 'breed_id': r[1], 'raca': r[2]} for r in cursor.fetchall()]
 
-        logger.info(f'Raças com origem {origem} recuperadas do banco de dados.')
+        logger.info(f'Racas com origem {origem} recuperadas do banco de dados.')
         return racas
     except Exception as e:
-        logger.error(f'Erro ao buscar raças por origem do banco de dados: {str(e)}')
+        logger.error(f'Erro ao buscar racas por origem do banco de dados: {str(e)}')
         raise
     finally:
         if conn:
@@ -294,10 +296,10 @@ def buscar_racas_por_temperamento_e_origem_from_database(temperamento, origem):
         cursor.execute('SELECT id, breed_id, raca FROM gatos WHERE temperamento LIKE ? AND origem = ? GROUP BY raca', (f'%{temperamento}%',origem,))
         racas = [{'id': r[0], 'breed_id': r[1], 'raca': r[2]} for r in cursor.fetchall()]
 
-        logger.info(f'Raças com origem {origem} e temperamento {temperamento} recuperadas do banco de dados.')
+        logger.info(f'Racas com origem {origem} e temperamento {temperamento} recuperadas do banco de dados.')
         return racas
     except Exception as e:
-        logger.error(f'Erro ao buscar raças por origem e temperamento do banco de dados: {str(e)}')
+        logger.error(f'Erro ao buscar racas por origem e temperamento do banco de dados: {str(e)}')
         raise
     finally:
         if conn:
